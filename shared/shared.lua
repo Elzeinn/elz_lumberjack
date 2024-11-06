@@ -39,5 +39,4 @@ Config.DataObject = {
         coords = vector4(-591.5726, 5495.7979, 53.8040 - 5, 289.2731),
         model = 'prop_tree_cedar_02'
     },
-
 }
