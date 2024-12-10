@@ -1,10 +1,5 @@
 Config = Config or {}
 
-Config.Jobs = {
-    use = true,
-    job = 'police',
-}
-
 Config.CutThree = {
     item = 'burger',
     amount = 3
@@ -14,6 +9,7 @@ Config.SellItems = {
     item = 'burger',
     price = 50,
     requiredForSell = 2,
+    payment = 'cash'
 }
 
 Config.PedLocation = {

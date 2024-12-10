@@ -1,5 +1,6 @@
 Utils = {}
 
+---@param model string
 Utils.LoadModel = function(model)
     if not HasModelLoaded(model) then
         RequestModel(model)
@@ -9,6 +10,7 @@ Utils.LoadModel = function(model)
     end
 end
 
+---@param dict string
 Utils.LoadAnim = function(dict)
     if not HasAnimDictLoaded(dict) then
         RequestAnimDict(dict)
@@ -18,6 +20,7 @@ Utils.LoadAnim = function(dict)
     end
 end
 
+---@param set string
 Utils.LoadAnimSet = function(set)
     if not HasAnimSetLoaded(set) then
         RequestAnimSet(set)
@@ -27,23 +30,15 @@ Utils.LoadAnimSet = function(set)
     end
 end
 
+---@param msg string
+---@param type string
+---@param duration number
 Utils.Notify = function(msg, type, duration)
-    if Framework == 'qb' then
-        exports.qbx_core:Notify(msg, type, duration)
-    elseif Framework == 'esx' then
-        ESX.ShowNotification(msg)
+    if Framework.IsQB == 'qb' then
+        return exports.qbx_core:Notify(msg, type, duration)
+    elseif Framework.IsESX == 'esx' then
+        return ESX.ShowNotification(msg)
     else
-        print(msg)
-    end
-end
-
-Utils.GetPlayerData = function()
-    if Framework == 'qb' then
-        local QBCore = exports['qb-core']:GetCoreObject()
-        return QBCore.Functions.GetPlayerData()
-    elseif Framework == 'esx' then
-        return ESX.PlayerData
-    else
-        print('not framework')
+        return exports.ox_lib:Notify(msg, type, duration)
     end
 end

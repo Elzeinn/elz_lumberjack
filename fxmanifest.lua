@@ -6,21 +6,24 @@ lua54 'yes'
 this_is_a_map 'yes'
 ui_page 'assets/index.html'
 
+shared_scripts {
+    '@ox_lib/init.lua',
+    'bridge/init.lua',
+    'shared/*.lua',
+}
+
 files {
     'assets/index.html',
     'assets/script.js',
     'assets/sound.mp3',
 }
 
-client_scripts {
-    'client/*.lua',
-}
-
 server_scripts {
+    'bridge/**/server.lua',
     'server/*.lua',
 }
 
-shared_scripts {
-    '@ox_lib/init.lua',
-    'shared/*.lua',
+client_scripts {
+    'bridge/**/client.lua',
+    'client/*.lua',
 }

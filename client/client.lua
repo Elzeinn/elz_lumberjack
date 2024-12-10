@@ -1,16 +1,17 @@
 -- Variables
 local object = nil
 local logObject = nil
-local PlayerData = {
-    active = false,
-}
 
--- Test Kenvera
 -- Function
+---@param start number
+---@param stop number
+---@param t number
 local function Lerp(start, stop, t)
     return start + (stop - start) * t
 end
 
+---@param data table
+---@return number
 local function SetupBlips(data)
     local blips = AddBlipForCoord(data.coords)
     SetBlipSprite(blips, 171)
@@ -19,12 +20,14 @@ local function SetupBlips(data)
     SetBlipAsShortRange(blips, true)
     SetBlipColour(blips, 28)
     BeginTextCommandSetBlipName('STRING')
-    AddTextComponentSubstringPlayerName('Pohon')
+    AddTextComponentSubstringPlayerName(Locale['lumberjack_nameBlips'])
     EndTextCommandSetBlipName(blips)
+    return blips
 end
 
+---@param entity number
 local function CuttingWood(entity)
-    Citizen.CreateThread(function()
+    CreateThread(function()
         SendNUIMessage({
             action = 'show',
             data = 'sound'
@@ -64,7 +67,7 @@ local function CuttingWood(entity)
         PlaceObjectOnGroundProperly(logObject)
         exports.ox_target:addLocalEntity(logObject, {
             icon = 'fa-solid fa-bong',
-            label = 'Potong Pohon',
+            label = Locale['lumberjack_targetName_cutWood'],
             onSelect = function(data)
                 local axeModel = "prop_tool_fireaxe"
                 Utils.LoadModel(axeModel)
@@ -112,6 +115,7 @@ local function CuttingWood(entity)
     end)
 end
 
+---@param data table
 local function CutTree(data)
     local ped = PlayerPedId()
     TaskTurnPedToFaceCoord(ped, data.coords.x, data.coords.y, data.coords.z, -1)
@@ -155,45 +159,35 @@ local function CutTree(data)
     CuttingWood(data.entity)
 end
 
-local function getLabelDuty()
-    if PlayerData.active then
-        return 'Off Duty'
-    else
-        return 'On Duty'
-    end
-end
-
-
 local function OpenMenu()
     lib.registerContext({
         id = 'event_menu',
-        title = 'Lumberjack Menu',
+        title = Locale['lumberjack_titleContextMenu'],
         menu = 'some_menu',
         options = {
             {
-                title = getLabelDuty(),
-                icon = 'fa-solid fa-clock',
-                description = 'Select to toggle duty',
-                onSelect = function()
-                    PlayerData.active = not PlayerData.active
-                end
-            },
-            {
-                title = 'Sell Item',
+                title = Locale['lumberjack_titleSellItem'],
                 icon = 'fa-solid fa-coins',
-                description = 'Sell item in here',
+                description = Locale['lumberjack_descriptionSell'],
                 onSelect = function()
-                    local input = lib.inputDialog('Lumberjack', {
-                        { type = 'number', label = 'Input', description = 'Amount for sell', icon = 'hashtag' },
+                    local input = lib.inputDialog(Locale['lumberjack_inputTitle'], {
+                        { type = 'number', label = 'Input', description = Locale['lumberjack_inputDescription'], icon = 'hashtag' },
                     })
                     local chekcItems = exports.ox_inventory:GetItemCount('burger')
                     if chekcItems >= Config.SellItems.requiredForSell then
                         local status = lib.callback.await('elz_lumberjack:server:SellItem', false,
                             { amount = input[1] })
+                        if status then
+                            lib.notify({
+                                title = Locale['lumberjack_notifyTitle'],
+                                description = Locale['lumberjack_successSell'],
+                                type = 'success'
+                            })
+                        end
                     else
                         lib.notify({
-                            title = 'Lumberjack',
-                            description = 'You do not have enough items',
+                            title = Locale['lumberjack_notifyTitle'],
+                            description = Locale['lumberjack_notEnoughItem'],
                             type = 'error'
                         })
                     end
@@ -201,7 +195,6 @@ local function OpenMenu()
             },
         }
     })
-
     lib.showContext('event_menu')
 end
 
@@ -217,14 +210,11 @@ CreateThread(function()
     end
     exports.ox_target:addModel('prop_tree_cedar_02', {
         icon = 'fa-solid fa-bong',
-        label = 'Tebang Pohon',
+        label = Locale['lumberjack_targetName_cutWood'],
         distance = 1,
         onSelect = function(data)
             CutTree(data)
         end,
-        canInteract = function()
-            return PlayerData.active and Config.Jobs.use
-        end
     })
 end)
 
@@ -237,14 +227,14 @@ CreateThread(function()
     FreezeEntityPosition(ped, true)
     exports.ox_target:addLocalEntity(ped, {
         icon = 'fa-solid fa-bong',
-        label = 'Start Working',
+        label = Locale['lumberjack_startWorking'],
         distance = 1,
-        onSelect = function(data)
+        onSelect = function()
             if not Config.Jobs.use then return OpenMenu() end
-            if Utils.GetPlayerData().job.name == Config.Jobs.job then
+            if Framework.GetPlayerData().job.name == Config.Jobs.job then
                 OpenMenu()
             else
-                Utils.Notify('Not Job Access')
+                Utils.Notify(Locale['lumberjack_notAccessJob'])
             end
         end
     })
