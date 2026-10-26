@@ -1,5 +1,7 @@
 ---@param source number
 lib.callback.register('elz_lumberjack:server:CutTree', function(source)
+    local status = lib.callback.await('elz_lumberjack:client:CheckValidate', source)
+    if not status then return end
     if exports.ox_inventory:CanCarryItem(source, Config.CutThree.item, Config.CutThree.amount) then
         Framework.AddItem(source, Config.CutThree.item, Config.CutThree.amount)
     end

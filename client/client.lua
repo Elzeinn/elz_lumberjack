@@ -10,6 +10,15 @@ local function Lerp(start, stop, t)
     return start + (stop - start) * t
 end
 
+local check = false
+
+lib.callback.register('elz_lumberjack:client:CheckValidate', function(val)
+    if check then
+        check = false; return true
+    end
+    return false
+end)
+
 ---@param data table
 ---@return number
 local function SetupBlips(data)
